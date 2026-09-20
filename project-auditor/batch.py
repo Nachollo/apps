@@ -54,12 +54,25 @@ def main() -> int:
     missing = []
     for item in catalog.get("projects", []):
         p = resolve_project(base, item)
+        td = None
+        source = str(p) if p else ""
+        if not p and item.get("repository"):
+            try:
+                p, td = auditor.clone(item["repository"], item.get("ref"))
+                source = item["repository"] + (f"#{item['ref']}" if item.get("ref") else "")
+            except Exception as exc:
+                missing.append(f"{item.get('name', 'sin nombre')}: repo no clonable ({exc})")
+                continue
         if not p:
             missing.append(item.get("name", "sin nombre"))
             continue
-        r = auditor.inspect(p, str(p), args.run, args.install, args.timeout)
-        reports.append(r)
-        auditor.save(r, out)
+        try:
+            r = auditor.inspect(p, source, args.run, args.install, args.timeout)
+            reports.append(r)
+            auditor.save(r, out)
+        finally:
+            if td:
+                td.cleanup()
 
     reports.sort(key=lambda r: r.score, reverse=True)
     summary = {
