@@ -88,7 +88,7 @@ def inspect(root:Path,source:str,run=False,install=False,timeout=180):
  workflow_files=[p for p in fs if '/.github/workflows/' in ('/'+p.relative_to(root).as_posix())]
  if workflow_files:
   workflow_text='\n'.join(txt(p).lower() for p in workflow_files)
-  real_ci=bool(re.search(r'(npm|pnpm|yarn)\\s+(ci|install|test)|npm\\s+run\\s+(build|lint)|pip\\s+install|pytest|python\\s+-m\\s+unittest|cargo\\s+test|go\\s+test',workflow_text))
+  real_ci=bool(re.search(r'(npm|pnpm|yarn)\s+(ci|install|test)|npm\s+run\s+(build|lint)|pip\s+install|pytest|python\s+-m\s+unittest|cargo\s+test|go\s+test',workflow_text))
   if real_ci: score+=5; strong.append('CI con pasos reales de instalación/build/test')
   else: score-=8; block.append('CI decorativo: workflow presente sin build/test real')
  else:
@@ -111,20 +111,20 @@ def inspect(root:Path,source:str,run=False,install=False,timeout=180):
    pj=json.loads(txt(root/'package.json')); declared += list((pj.get('dependencies') or {}).keys())+list((pj.get('devDependencies') or {}).keys())
  except Exception: pass
  if (root/'requirements.txt').exists():
-  declared += [re.split(r'[<>=!~\\[]',x.strip(),1)[0].lower() for x in txt(root/'requirements.txt').splitlines() if x.strip() and not x.lstrip().startswith('#')]
+  declared += [re.split(r'[<>=!~\[]',x.strip(),1)[0].lower() for x in txt(root/'requirements.txt').splitlines() if x.strip() and not x.lstrip().startswith('#')]
  unused=[d for d,n in prominent.items() if d in declared and not any(x.lower() in source_all for x in n)]
  if unused:
   score-=min(8,len(unused)*2); block.append('dependencias relevantes declaradas pero sin uso localizado: '+', '.join(unused))
 
  # Known library/API incompatibilities that can make an optional feature non-functional.
  req_text=txt(root/'requirements.txt').lower() if (root/'requirements.txt').exists() else ''
- m_openai=re.search(r'^openai\\s*==\\s*(\\d+)\\.',req_text,re.M)
+ m_openai=re.search(r'^openai\s*==\s*(\d+)\.',req_text,re.M)
  if m_openai and int(m_openai.group(1))>=1 and ('openai.chatcompletion.create' in source_all or 'openai.completion.create' in source_all):
   score-=15
   block.append('OpenAI incompatible: paquete openai>=1 declarado con API legacy openai.ChatCompletion/Completion.create')
 
  if tests:
-  framework=any(re.search(r'\\b(pytest|unittest|jest|vitest|mocha)\\b',txt(p),re.I) for p in test_paths)
+  framework=any(re.search(r'\b(pytest|unittest|jest|vitest|mocha)\b',txt(p),re.I) for p in test_paths)
   if not framework:
    score-=4; block.append('tests tipo script/ad hoc sin framework de test localizado')
   if (root/'package.json').exists() and 'test' not in scripts(root):
