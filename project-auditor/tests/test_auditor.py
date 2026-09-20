@@ -41,5 +41,32 @@ class AuditorTests(unittest.TestCase):
             self.assertGreaterEqual(r.source_files, 10)
 
 
+    def test_flags_decorative_ci(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "ci-demo"
+            (root / "src").mkdir(parents=True)
+            (root / ".github" / "workflows").mkdir(parents=True)
+            for i in range(10):
+                (root / "src" / f"m{i}.py").write_text("def f():\n    return 1\n", encoding="utf-8")
+            (root / ".github" / "workflows" / "ci.yml").write_text(
+                "jobs:\n  build:\n    steps:\n      - run: echo Hello, world!\n",
+                encoding="utf-8",
+            )
+            r = auditor.inspect(root, str(root), run=False, install=False, timeout=10)
+            self.assertTrue(any("CI decorativo" in x for x in r.blockers))
+
+    def test_flags_unused_prominent_dependency(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "unused-ai"
+            (root / "src").mkdir(parents=True)
+            (root / "src" / "app.js").write_text("export const sum = (a,b) => a+b;", encoding="utf-8")
+            (root / "package.json").write_text(
+                '{"scripts":{"build":"echo ok"},"dependencies":{"@tensorflow/tfjs":"^4.0.0"}}',
+                encoding="utf-8",
+            )
+            r = auditor.inspect(root, str(root), run=False, install=False, timeout=10)
+            self.assertTrue(any("dependencias relevantes declaradas" in x for x in r.blockers))
+
+
 if __name__ == "__main__":
     unittest.main()
