@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "projects": [
+    {"name": "ContaES", "aliases": ["contaes"], "source": "", "critical_checks": ["motor contable real", "importación de datos", "persistencia", "tests de cálculos"]},
+    {"name": "SENTINEL", "aliases": ["sentinel"], "source": "", "critical_checks": ["reproducir suite completa", "verificar claims 145/145", "fuentes reales", "informes con evidencias", "no confundir con software de auditoría"]},
+    {"name": "PulseDJ", "aliases": ["pulsedj", "vortex dj"], "source": "", "critical_checks": ["audio real", "latencia", "mezcla", "IA real", "exportación", "tests"]},
+    {"name": "TraduFlow", "aliases": ["traduflow"], "source": "", "critical_checks": ["traducción real", "preservación de formato", "colas", "archivos", "proveedor LLM"]},
+    {"name": "PromptForge", "aliases": ["prompts", "go prompts ai"], "source": "", "critical_checks": ["backend", "usuarios", "pagos", "modelos externos", "secretos expuestos"]},
+    {"name": "Viajes", "aliases": ["travel", "viajes"], "source": "", "critical_checks": ["búsqueda real", "precios actuales", "reservas o enlaces", "persistencia"]},
+    {"name": "ReservIA", "aliases": ["reserv-ia", "reservia"], "source": "", "critical_checks": ["backend", "agenda real", "widget real", "integraciones", "reservas persistentes"]},
+    {"name": "Machine Tip", "aliases": ["machine tip", "machinetip"], "source": "", "critical_checks": ["caso de uso real", "backend", "datos", "acciones reales"]},
+    {"name": "Copywriter", "aliases": ["copywriter"], "source": "", "critical_checks": ["generación real", "plantillas", "historial", "coste por uso"]},
+    {"name": "AXON", "aliases": ["axon"], "source": "", "critical_checks": ["catálogo", "pagos", "facturación", "newsletter", "chatbot", "automatización marketing"]},
+    {"name": "MindMetrics", "aliases": ["mindmetrics"], "source": "", "critical_checks": ["lógica de producto", "datos", "privacidad", "tests"]},
+    {"name": "SubvencIA", "aliases": ["subvencia"], "source": "", "critical_checks": ["normativa real", "checklist", "BDNS", "carga masiva", "papeles de trabajo"]},
+    {"name": "TALSANET", "aliases": ["talsanet", "talsabell tablet"], "source": "", "critical_checks": ["conexión PLC/IoT", "modo offline", "telemetría", "backoffice", "ciberseguridad"]},
+    {"name": "Qentyra", "aliases": ["qentyra"], "source": "", "critical_checks": ["propuesta de valor", "backend", "datos", "pagos"]},
+    {"name": "Software Auditoría", "aliases": ["audit-pro", "normativa-contable"], "source": "", "critical_checks": ["OCR", "clasificación", "IA local", "60 papeles", "autorrecuperación", "trazabilidad"]}
+  ]
+}
