@@ -68,5 +68,18 @@ class AuditorTests(unittest.TestCase):
             self.assertTrue(any("dependencias relevantes declaradas" in x for x in r.blockers))
 
 
+    def test_flags_legacy_openai_api_with_v1_package(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "openai-broken"
+            root.mkdir()
+            (root / "app.py").write_text(
+                "import openai\nopenai.ChatCompletion.create(model='gpt-4', messages=[])\n",
+                encoding="utf-8",
+            )
+            (root / "requirements.txt").write_text("openai==1.3.0\n", encoding="utf-8")
+            r = auditor.inspect(root, str(root), run=False, install=False, timeout=10)
+            self.assertTrue(any("OpenAI incompatible" in x for x in r.blockers))
+
+
 if __name__ == "__main__":
     unittest.main()
