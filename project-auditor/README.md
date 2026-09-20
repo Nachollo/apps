@@ -76,3 +76,26 @@ Incluye un fixture deliberadamente de “paja” para comprobar que una demo con
 ## Siguiente capa
 
 La V2 debería conservar histórico por proyecto, comparar auditorías entre fechas y añadir pruebas end-to-end específicas por producto (por ejemplo reservas reales, pagos, audio, OCR o consultas externas), además del análisis genérico actual.
+
+
+## Repositorios remotos en el catálogo
+
+Un proyecto puede auditarse directamente desde GitHub sin tener una copia local:
+
+```json
+{
+  "name": "Software Auditoría",
+  "repository": "https://github.com/Nachollo/normativa-contable-espa-a.git",
+  "ref": "copilot/fix-75705fbf-ec86-411e-8e16-2c0962564099"
+}
+```
+
+`batch.py` prioriza `repository`/`repo`; si no existe, intenta localizar la carpeta local por `source` o aliases. Esto permite una cartera híbrida de repos GitHub y proyectos locales.
+
+Ejemplo:
+
+```powershell
+python batch.py --root "C:\ruta\proyectos" --catalog catalog.json --run
+```
+
+Los repos remotos se clonan temporalmente y se eliminan tras la auditoría.
