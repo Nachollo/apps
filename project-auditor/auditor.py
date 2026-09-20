@@ -7,7 +7,7 @@ from pathlib import Path
 EXCLUDE={'.git','node_modules','.next','dist','build','coverage','.venv','venv','__pycache__','.pytest_cache'}
 SOURCE={'.py','.js','.jsx','.ts','.tsx','.mjs','.cjs','.go','.rs','.java','.kt','.php','.rb'}
 TEXT=SOURCE|{'.json','.md','.html','.css','.scss','.sql','.yml','.yaml','.toml','.ini','.txt'}
-MOCK=('mock','mocked','demo','placeholder','fake','stub','dummy','todo','fixme','coming soon','not implemented','modo demostración','modo demo','simular','simulad','simulación','simulacion','en producción','en produccion','hardcoded')
+MOCK=('mock','mocked','demo','placeholder','fake','stub','dummy','todo','fixme','coming soon','not implemented','modo demostración','modo demo','simular','simulad','simulación','simulacion','en producción','en produccion','hardcoded','sample data','datos de ejemplo','example data')
 FEATURES={
  'backend':(r'\bexpress\b',r'\bfastapi\b',r'\bdjango\b',r'\bflask\b',r'app\.(get|post|put|delete)\('),
  'database':(r'postgres',r'mysql',r'sqlite',r'mongodb',r'prisma',r'supabase',r'firebase',r'sqlalchemy',r'drizzle'),
@@ -115,6 +115,13 @@ def inspect(root:Path,source:str,run=False,install=False,timeout=180):
  unused=[d for d,n in prominent.items() if d in declared and not any(x.lower() in source_all for x in n)]
  if unused:
   score-=min(8,len(unused)*2); block.append('dependencias relevantes declaradas pero sin uso localizado: '+', '.join(unused))
+
+ # Known library/API incompatibilities that can make an optional feature non-functional.
+ req_text=txt(root/'requirements.txt').lower() if (root/'requirements.txt').exists() else ''
+ m_openai=re.search(r'^openai\\s*==\\s*(\\d+)\\.',req_text,re.M)
+ if m_openai and int(m_openai.group(1))>=1 and ('openai.chatcompletion.create' in source_all or 'openai.completion.create' in source_all):
+  score-=15
+  block.append('OpenAI incompatible: paquete openai>=1 declarado con API legacy openai.ChatCompletion/Completion.create')
 
  if tests:
   framework=any(re.search(r'\\b(pytest|unittest|jest|vitest|mocha)\\b',txt(p),re.I) for p in test_paths)
