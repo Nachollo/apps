@@ -1,0 +1,31 @@
+name: Project Auditor CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "project-auditor/**"
+      - ".github/workflows/project-auditor-ci.yml"
+  push:
+    branches:
+      - "project-auditor-v1"
+    paths:
+      - "project-auditor/**"
+      - ".github/workflows/project-auditor-ci.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: project-auditor
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile
+        run: python -m compileall -q .
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
