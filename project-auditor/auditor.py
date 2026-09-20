@@ -105,16 +105,60 @@ def inspect(root:Path,source:str,run=False,install=False,timeout=180):
   'stripe':['from \'stripe','from "stripe','require(\'stripe','require("stripe','import stripe'],
   'ollama':['import ollama','from ollama']
  }
- declared=[]
+ declared=[]; node_declared=set(); pj={}
  try:
   if (root/'package.json').exists():
-   pj=json.loads(txt(root/'package.json')); declared += list((pj.get('dependencies') or {}).keys())+list((pj.get('devDependencies') or {}).keys())
+   pj=json.loads(txt(root/'package.json'))
+   node_declared=set((pj.get('dependencies') or {}).keys()) | set((pj.get('devDependencies') or {}).keys()) | set((pj.get('optionalDependencies') or {}).keys())
+   declared += list(node_declared)
  except Exception: pass
  if (root/'requirements.txt').exists():
-  declared += [re.split(r'[<>=!~\[]',x.strip(),1)[0].lower() for x in txt(root/'requirements.txt').splitlines() if x.strip() and not x.lstrip().startswith('#')]
+  declared += [re.split(r'[<>=!~\\[]',x.strip(),1)[0].lower() for x in txt(root/'requirements.txt').splitlines() if x.strip() and not x.lstrip().startswith('#')]
  unused=[d for d,n in prominent.items() if d in declared and not any(x.lower() in source_all for x in n)]
  if unused:
   score-=min(8,len(unused)*2); block.append('dependencias relevantes declaradas pero sin uso localizado: '+', '.join(unused))
+
+ # Node/JS: external production imports should be declared explicitly.
+ if node_declared:
+  builtins={'assert','buffer','child_process','cluster','crypto','events','fs','http','https','module','net','os','path','perf_hooks','process','querystring','readline','stream','string_decoder','timers','tls','tty','url','util','v8','vm','worker_threads','zlib','sqlite'}
+  imported=set()
+  for p in fs:
+   if p.suffix.lower() not in {'.js','.jsx','.ts','.tsx','.mjs','.cjs'} or is_test(p.relative_to(root).as_posix()): continue
+   body=txt(p)
+   specs=re.findall(r"(?:from\\s+|require\\(\\s*|import\\(\\s*)['\\\"]([^'\\\"]+)['\\\"]",body)
+   specs += re.findall(r"^\\s*import\\s+['\\\"]([^'\\\"]+)['\\\"]",body,re.M)
+   for spec in specs:
+    if spec.startswith(('.', '/', 'node:', 'http://', 'https://')): continue
+    pkg='/'.join(spec.split('/')[:2]) if spec.startswith('@') else spec.split('/')[0]
+    if pkg and pkg not in builtins: imported.add(pkg)
+  missing_imports=sorted(imported-node_declared)
+  if missing_imports:
+   score-=min(20,len(missing_imports)*6)
+   block.append('imports Node no declarados en package.json: '+', '.join(missing_imports))
+
+ # Packaging references should resolve to real files/folders.
+ if pj.get('build'):
+  build=pj.get('build') or {}; missing_assets=[]
+  win=build.get('win') or {}
+  if isinstance(win,dict) and win.get('icon') and not (root/win['icon']).exists(): missing_assets.append(win['icon'])
+  nsis=build.get('nsis') or {}
+  if isinstance(nsis,dict) and nsis.get('license') and not (root/nsis['license']).exists(): missing_assets.append(nsis['license'])
+  for er in build.get('extraResources') or []:
+   if isinstance(er,dict) and er.get('from') and not (root/er['from']).exists(): missing_assets.append(er['from'])
+  if missing_assets:
+   score-=min(12,len(set(missing_assets))*4)
+   block.append('empaquetado referencia recursos inexistentes: '+', '.join(sorted(set(missing_assets))))
+
+ tauri=root/'src-tauri'/'tauri.conf.json'
+ if tauri.exists():
+  try:
+   tc=json.loads(txt(tauri)); missing_icons=[]
+   for icon in ((tc.get('bundle') or {}).get('icon') or []):
+    if not (tauri.parent/icon).exists(): missing_icons.append(icon)
+   if missing_icons:
+    score-=min(8,len(missing_icons)*2)
+    block.append('Tauri referencia iconos inexistentes: '+', '.join(missing_icons))
+  except Exception: pass
 
  # Known library/API incompatibilities that can make an optional feature non-functional.
  req_text=txt(root/'requirements.txt').lower() if (root/'requirements.txt').exists() else ''
