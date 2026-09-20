@@ -90,5 +90,33 @@ class AuditorTests(unittest.TestCase):
             self.assertEqual(r.verdict, "ESPECIFICACIÓN / DOCUMENTACIÓN — SIN CÓDIGO")
 
 
+    def test_flags_undeclared_node_import(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "node-missing"
+            root.mkdir()
+            (root / "package.json").write_text(
+                '{"dependencies":{"fastify":"^5.0.0"}}',
+                encoding="utf-8",
+            )
+            (root / "app.js").write_text(
+                "import Fastify from 'fastify';\nimport { createCanvas } from 'canvas';\n",
+                encoding="utf-8",
+            )
+            r = auditor.inspect(root, str(root), run=False, install=False, timeout=10)
+            self.assertTrue(any("imports Node no declarados" in x and "canvas" in x for x in r.blockers))
+
+    def test_flags_missing_packaging_assets(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "packaging"
+            root.mkdir()
+            (root / "app.js").write_text("export const x = 1;\n", encoding="utf-8")
+            (root / "package.json").write_text(
+                '{"devDependencies":{"electron-builder":"^25.0.0"},"build":{"win":{"icon":"build/icon.ico"},"extraResources":[{"from":"tesseract-lang","to":"tesseract-lang"}]}}',
+                encoding="utf-8",
+            )
+            r = auditor.inspect(root, str(root), run=False, install=False, timeout=10)
+            self.assertTrue(any("empaquetado referencia recursos inexistentes" in x for x in r.blockers))
+
+
 if __name__ == "__main__":
     unittest.main()
