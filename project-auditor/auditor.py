@@ -7,7 +7,7 @@ from pathlib import Path
 EXCLUDE={'.git','node_modules','.next','dist','build','coverage','.venv','venv','__pycache__','.pytest_cache'}
 SOURCE={'.py','.js','.jsx','.ts','.tsx','.mjs','.cjs','.go','.rs','.java','.kt','.php','.rb'}
 TEXT=SOURCE|{'.json','.md','.html','.css','.scss','.sql','.yml','.yaml','.toml','.ini','.txt'}
-MOCK=('mock','mocked','demo','placeholder','fake','stub','dummy','todo','fixme','coming soon','not implemented','modo demostración','modo demo','simulad','hardcoded')
+MOCK=('mock','mocked','demo','placeholder','fake','stub','dummy','todo','fixme','coming soon','not implemented','modo demostración','modo demo','simular','simulad','simulación','simulacion','en producción','en produccion','hardcoded')
 FEATURES={
  'backend':(r'\bexpress\b',r'\bfastapi\b',r'\bdjango\b',r'\bflask\b',r'app\.(get|post|put|delete)\('),
  'database':(r'postgres',r'mysql',r'sqlite',r'mongodb',r'prisma',r'supabase',r'firebase',r'sqlalchemy',r'drizzle'),
@@ -62,13 +62,14 @@ def run_cmd(name,cmd,root,timeout):
  except OSError as e: return Cmd(name,' '.join(cmd),False,None,reason=str(e))
 
 def inspect(root:Path,source:str,run=False,install=False,timeout=180):
- fs=list(files(root)); sf=lines=tests=mh=mf=0; hit={k:[] for k in FEATURES}
+ fs=list(files(root)); sf=lines=tests=mh=mf=0; hit={k:[] for k in FEATURES}; source_blob=[]; test_paths=[]
  for p in fs:
-  rel=p.relative_to(root).as_posix(); t=txt(p); low=t.lower()
-  if p.suffix.lower() in SOURCE: sf+=1; lines+=t.count('\n')+(1 if t else 0)
-  if is_test(rel): tests+=1
-  n=sum(low.count(x) for x in MOCK)
-  if n: mh+=n; mf+=1
+  rel=p.relative_to(root).as_posix(); t=txt(p); low=t.lower(); is_source=p.suffix.lower() in SOURCE
+  if is_source:
+   sf+=1; lines+=t.count('\n')+(1 if t else 0); source_blob.append(low)
+   n=sum(low.count(x) for x in MOCK)
+   if n: mh+=n; mf+=1
+  if is_test(rel): tests+=1; test_paths.append(p)
   for k,pats in FEATURES.items():
    if any(re.search(q,t,re.I) for q in pats): hit[k].append(rel)
  readme=next((root/n for n in ('README.md','readme.md','README') if (root/n).exists()),None)
@@ -83,6 +84,44 @@ def inspect(root:Path,source:str,run=False,install=False,timeout=180):
  for name,cmd in planned(root): cmds.append(run_cmd(name,cmd,root,timeout) if run else Cmd(name,' '.join(cmd),False,None,reason='usa --run'))
  feat={k:{'present':bool(v),'files':v[:10],'count_files':len(v)} for k,v in hit.items()}
  score=0; strong=[]; block=[]
+ source_all='\n'.join(source_blob)
+ workflow_files=[p for p in fs if '/.github/workflows/' in ('/'+p.relative_to(root).as_posix())]
+ if workflow_files:
+  workflow_text='\n'.join(txt(p).lower() for p in workflow_files)
+  real_ci=bool(re.search(r'(npm|pnpm|yarn)\\s+(ci|install|test)|npm\\s+run\\s+(build|lint)|pip\\s+install|pytest|python\\s+-m\\s+unittest|cargo\\s+test|go\\s+test',workflow_text))
+  if real_ci: score+=5; strong.append('CI con pasos reales de instalación/build/test')
+  else: score-=8; block.append('CI decorativo: workflow presente sin build/test real')
+ else:
+  block.append('sin CI verificable')
+
+ prominent={
+  '@tensorflow/tfjs':['@tensorflow/tfjs','from \'@tensorflow','require(\'@tensorflow'],
+  'natural':['from \'natural','require(\'natural','from "natural','require("natural'],
+  'compromise':['from \'compromise','require(\'compromise','from "compromise','require("compromise'],
+  'openai':['import openai','from openai'],
+  'transformers':['import transformers','from transformers'],
+  'torch':['import torch','from torch'],
+  'sentence-transformers':['sentence_transformers'],
+  'stripe':['from \'stripe','from "stripe','require(\'stripe','require("stripe','import stripe'],
+  'ollama':['import ollama','from ollama']
+ }
+ declared=[]
+ try:
+  if (root/'package.json').exists():
+   pj=json.loads(txt(root/'package.json')); declared += list((pj.get('dependencies') or {}).keys())+list((pj.get('devDependencies') or {}).keys())
+ except Exception: pass
+ if (root/'requirements.txt').exists():
+  declared += [re.split(r'[<>=!~\\[]',x.strip(),1)[0].lower() for x in txt(root/'requirements.txt').splitlines() if x.strip() and not x.lstrip().startswith('#')]
+ unused=[d for d,n in prominent.items() if d in declared and not any(x.lower() in source_all for x in n)]
+ if unused:
+  score-=min(8,len(unused)*2); block.append('dependencias relevantes declaradas pero sin uso localizado: '+', '.join(unused))
+
+ if tests:
+  framework=any(re.search(r'\\b(pytest|unittest|jest|vitest|mocha)\\b',txt(p),re.I) for p in test_paths)
+  if not framework:
+   score-=4; block.append('tests tipo script/ad hoc sin framework de test localizado')
+  if (root/'package.json').exists() and 'test' not in scripts(root):
+   score-=5; block.append('hay ficheros de test pero package.json no define script test')
  if sf>=10: score+=15; strong.append(f'base de código: {sf} ficheros fuente')
  elif sf>=3: score+=8
  else: block.append('muy pocos ficheros fuente')
@@ -121,17 +160,19 @@ def markdown(r):
 def save(r,out):
  out.mkdir(parents=True,exist_ok=True); slug=re.sub(r'[^A-Za-z0-9._-]+','_',r.project); j=out/f'{slug}.audit.json'; m=out/f'{slug}.audit.md'; j.write_text(json.dumps(asdict(r),ensure_ascii=False,indent=2),encoding='utf-8'); m.write_text(markdown(r),encoding='utf-8'); return j,m
 
-def clone(url):
- td=tempfile.TemporaryDirectory(prefix='project-auditor-'); dst=Path(td.name)/'repo'; p=subprocess.run(['git','clone','--depth','1',url,str(dst)],text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=180)
+def clone(url,ref=None):
+ td=tempfile.TemporaryDirectory(prefix='project-auditor-'); dst=Path(td.name)/'repo'; cmd=['git','clone','--depth','1'];
+ if ref: cmd += ['--branch',ref]
+ cmd += [url,str(dst)]; p=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=180)
  if p.returncode: td.cleanup(); raise RuntimeError(p.stdout[-3000:])
  return dst,td
 
 def main():
- ap=argparse.ArgumentParser(); g=ap.add_mutually_exclusive_group(required=True); g.add_argument('--path'); g.add_argument('--repo'); ap.add_argument('--run',action='store_true'); ap.add_argument('--install',action='store_true'); ap.add_argument('--timeout',type=int,default=180); ap.add_argument('--out',default='audit-results'); a=ap.parse_args(); td=None
+ ap=argparse.ArgumentParser(); g=ap.add_mutually_exclusive_group(required=True); g.add_argument('--path'); g.add_argument('--repo'); ap.add_argument('--ref'); ap.add_argument('--run',action='store_true'); ap.add_argument('--install',action='store_true'); ap.add_argument('--timeout',type=int,default=180); ap.add_argument('--out',default='audit-results'); a=ap.parse_args(); td=None
  try:
-  root,td=clone(a.repo) if a.repo else (Path(a.path).expanduser().resolve(),None)
+  root,td=clone(a.repo,a.ref) if a.repo else (Path(a.path).expanduser().resolve(),None)
   if not root.is_dir(): raise RuntimeError(f'No existe: {root}')
-  r=inspect(root,a.repo or str(root),a.run,a.install,a.timeout); j,m=save(r,Path(a.out)); print(markdown(r)); print('JSON:',j); print('Markdown:',m); return 0 if r.score>=30 else 2
+  source=(a.repo + (f'#{a.ref}' if a.ref else '')) if a.repo else str(root); r=inspect(root,source,a.run,a.install,a.timeout); j,m=save(r,Path(a.out)); print(markdown(r)); print('JSON:',j); print('Markdown:',m); return 0 if r.score>=30 else 2
  finally:
   if td: td.cleanup()
 if __name__=='__main__': raise SystemExit(main())
