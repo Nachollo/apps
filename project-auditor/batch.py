@@ -35,7 +35,7 @@ def resolve_project(base: Path, item: dict) -> Path | None:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Audita todos los proyectos del catálogo")
-    ap.add_argument("--root", required=True, help="Carpeta que contiene los proyectos")
+    ap.add_argument("--root", default=".", help="Carpeta que contiene los proyectos locales")
     ap.add_argument("--catalog", default="catalog.json")
     ap.add_argument("--run", action="store_true")
     ap.add_argument("--install", action="store_true")
