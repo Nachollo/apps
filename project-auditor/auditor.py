@@ -152,7 +152,7 @@ def inspect(root:Path,source:str,run=False,install=False,timeout=180):
  ui=sum(1 for p in fs if p.suffix.lower() in {'.html','.css','.scss','.jsx','.tsx'})
  if ui>=3 and not feat['backend']['present'] and not feat['database']['present']: score-=12; block.append('UI sin evidencia suficiente de backend/persistencia')
  score=max(0,min(100,score)); executed=any(c.name in {'tests','build'} and c.attempted for c in cmds); conf='alta' if executed else ('media' if sf>=5 else 'baja')
- verdict='FUNCIONAL PROBADO' if score>=75 and executed and not any(c.attempted and c.passed is False for c in cmds) else 'FUNCIONAL PARCIAL / FALTA ACREDITAR' if score>=55 else 'PROTOTIPO / DEMO' if score>=30 else 'PAJA / CLAIMS NO ACREDITADAS'
+ verdict='ESPECIFICACIÓN / DOCUMENTACIÓN — SIN CÓDIGO' if sf==0 and len(fs)>0 else ('FUNCIONAL PROBADO' if score>=75 and executed and not any(c.attempted and c.passed is False for c in cmds) else 'FUNCIONAL PARCIAL / FALTA ACREDITAR' if score>=55 else 'PROTOTIPO / DEMO' if score>=30 else 'PAJA / CLAIMS NO ACREDITADAS')
  return Report(root.name,source,verdict,score,conf,len(fs),sf,lines,tests,mh,mf,cl[:30],feat,cmds,strong,block)
 
 def markdown(r):
