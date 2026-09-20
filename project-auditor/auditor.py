@@ -125,8 +125,8 @@ def inspect(root:Path,source:str,run=False,install=False,timeout=180):
   for p in fs:
    if p.suffix.lower() not in {'.js','.jsx','.ts','.tsx','.mjs','.cjs'} or is_test(p.relative_to(root).as_posix()): continue
    body=txt(p)
-   specs=re.findall(r"(?:from\\s+|require\\(\\s*|import\\(\\s*)['\\\"]([^'\\\"]+)['\\\"]",body)
-   specs += re.findall(r"^\\s*import\\s+['\\\"]([^'\\\"]+)['\\\"]",body,re.M)
+   specs=re.findall(r"(?:from\s+|require\(\s*|import\(\s*)['\"]([^'\"]+)['\"]",body)
+   specs += re.findall(r"^\s*import\s+['\"]([^'\"]+)['\"]",body,re.M)
    for spec in specs:
     if spec.startswith(('.', '/', 'node:', 'http://', 'https://')): continue
     pkg='/'.join(spec.split('/')[:2]) if spec.startswith('@') else spec.split('/')[0]
