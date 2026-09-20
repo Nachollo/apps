@@ -81,5 +81,14 @@ class AuditorTests(unittest.TestCase):
             self.assertTrue(any("OpenAI incompatible" in x for x in r.blockers))
 
 
+    def test_documentation_only_is_not_called_fake(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "spec"
+            root.mkdir()
+            (root / "README.md").write_text("# Proyecto\nArquitectura, roadmap y requisitos.", encoding="utf-8")
+            r = auditor.inspect(root, str(root), run=False, install=False, timeout=10)
+            self.assertEqual(r.verdict, "ESPECIFICACIÓN / DOCUMENTACIÓN — SIN CÓDIGO")
+
+
 if __name__ == "__main__":
     unittest.main()
