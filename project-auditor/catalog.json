@@ -1,0 +1,337 @@
+{
+  "version": 1,
+  "projects": [
+    {
+      "name": "ContaES",
+      "aliases": [
+        "contaes"
+      ],
+      "source": "",
+      "critical_checks": [
+        "motor contable real",
+        "importación de datos",
+        "persistencia",
+        "tests de cálculos"
+      ],
+      "source_status": "not_located_in_github_or_library_as_source_package"
+    },
+    {
+      "name": "SENTINEL",
+      "aliases": [
+        "sentinel"
+      ],
+      "source": "",
+      "critical_checks": [
+        "reproducir suite completa",
+        "verificar claims 145/145",
+        "fuentes reales",
+        "informes con evidencias",
+        "no confundir con software de auditoría"
+      ],
+      "source_status": "not_located_in_github_or_library_as_source_package",
+      "source_origin_note": "Technical PDFs identify a local path C:\\\\Users\\\\Usuario\\\\.minimax\\\\workspace\\\\sentinel-app, but the actual sentinel-app package/repo has not been found."
+    },
+    {
+      "name": "PulseDJ",
+      "aliases": [
+        "pulsedj",
+        "vortex dj"
+      ],
+      "source": "",
+      "critical_checks": [
+        "audio real",
+        "latencia",
+        "mezcla",
+        "IA real",
+        "exportación",
+        "tests"
+      ],
+      "source_status": "not_located_in_github_or_library_as_source_package"
+    },
+    {
+      "name": "TraduFlow",
+      "aliases": [
+        "traduflow"
+      ],
+      "source": "",
+      "critical_checks": [
+        "traducción real",
+        "preservación de formato",
+        "colas",
+        "archivos",
+        "proveedor LLM"
+      ],
+      "source_status": "not_located_in_github_or_library_as_source_package"
+    },
+    {
+      "name": "PromptForge",
+      "aliases": [
+        "prompts",
+        "go prompts ai"
+      ],
+      "source": "",
+      "critical_checks": [
+        "backend",
+        "usuarios",
+        "pagos",
+        "modelos externos",
+        "secretos expuestos"
+      ],
+      "source_packages": [
+        {
+          "type": "library_zip",
+          "name": "promptforge-complete.zip",
+          "file_id": "file_0000000041f081f485ea7ab2a3d1dcdc",
+          "library_file_id": "libfile_c894aae446588191a1cabcbd3ada2717",
+          "library_path": "/promptforge-complete.zip",
+          "verified_contents": "full_source",
+          "source_files_observed": 292,
+          "test_files_observed": 2
+        }
+      ],
+      "source_status": "located"
+    },
+    {
+      "name": "Viajes",
+      "aliases": [
+        "travel",
+        "viajes"
+      ],
+      "source": "",
+      "critical_checks": [
+        "búsqueda real",
+        "precios actuales",
+        "reservas o enlaces",
+        "persistencia"
+      ],
+      "source_status": "not_located_in_github_or_library_as_source_package"
+    },
+    {
+      "name": "ReservIA",
+      "aliases": [
+        "reserv-ia",
+        "reservia"
+      ],
+      "source": "",
+      "critical_checks": [
+        "backend",
+        "agenda real",
+        "widget real",
+        "integraciones",
+        "reservas persistentes"
+      ],
+      "source_packages": [
+        {
+          "type": "library_zip",
+          "name": "ReservIA_Master_App_V4.1_Codigo_Revisado.zip",
+          "file_id": "file_00000000d6ec81f8bd8b8014d0130155",
+          "library_file_id": "libfile_96c26c1f9f2881918b2a4859da7e34aa",
+          "library_path": "/ReservIA_Master_App_V4.1_Codigo_Revisado.zip",
+          "verified_contents": "full_source",
+          "source_files_observed": 26,
+          "test_files_observed": 4
+        }
+      ],
+      "source_status": "located"
+    },
+    {
+      "name": "Machine Tip",
+      "aliases": [
+        "machine tip",
+        "machinetip"
+      ],
+      "source": "",
+      "critical_checks": [
+        "caso de uso real",
+        "backend",
+        "datos",
+        "acciones reales"
+      ],
+      "source_status": "not_located_in_github_or_library_as_source_package",
+      "source_origin_note": "Historical context indicates the prototype was created in Sites; no exportable repo/ZIP is available through current connectors."
+    },
+    {
+      "name": "Copywriter",
+      "aliases": [
+        "copywriter"
+      ],
+      "source": "",
+      "critical_checks": [
+        "generación real",
+        "plantillas",
+        "historial",
+        "coste por uso"
+      ],
+      "source_status": "not_located_in_github_or_library_as_source_package"
+    },
+    {
+      "name": "AXON",
+      "aliases": [
+        "axon"
+      ],
+      "source": "",
+      "critical_checks": [
+        "catálogo",
+        "pagos",
+        "facturación",
+        "newsletter",
+        "chatbot",
+        "automatización marketing"
+      ],
+      "source_packages": [
+        {
+          "type": "library_zip",
+          "name": "AXON_web_dashboard_v0.1.zip",
+          "file_id": "file_00000000871071f4b83c6f55a05ed36a",
+          "library_file_id": "libfile_d4f069d06cf081919d1a2f6ffa533595",
+          "library_path": "/AXON_web_dashboard_v0.1.zip",
+          "verified_contents": "static_frontend_only",
+          "source_files_observed": 1,
+          "test_files_observed": 0
+        }
+      ],
+      "source_status": "located"
+    },
+    {
+      "name": "MindMetrics",
+      "aliases": [
+        "mindmetrics"
+      ],
+      "source": "",
+      "critical_checks": [
+        "lógica de producto",
+        "datos",
+        "privacidad",
+        "tests"
+      ],
+      "source_packages": [
+        {
+          "type": "library_zip",
+          "name": "mindmetrics-compliance-ready-v1_3(1).zip",
+          "file_id": "file_00000000b37071f4af7d225bdbcb65ab",
+          "library_file_id": "libfile_470f278afd3c8191a087a4b168a1ec0a",
+          "library_path": "/mindmetrics-compliance-ready-v1_3(1).zip",
+          "verified_contents": "source_plus_compliance",
+          "source_files_observed": 1,
+          "test_files_observed": 0
+        },
+        {
+          "type": "library_zip",
+          "name": "mindmetrics-ultimate.zip",
+          "file_id": "file_0000000041d472468f153ec9491c2a35",
+          "library_file_id": "libfile_128c5dcec1608191a4f0e56fbee67cdf",
+          "library_path": "/mindmetrics-ultimate.zip",
+          "verified_contents": "source_with_build_dependencies",
+          "source_files_observed": 2,
+          "test_files_observed": 0
+        }
+      ],
+      "source_status": "located"
+    },
+    {
+      "name": "SubvencIA",
+      "aliases": [
+        "subvencia"
+      ],
+      "source": "",
+      "critical_checks": [
+        "normativa real",
+        "checklist",
+        "BDNS",
+        "carga masiva",
+        "papeles de trabajo"
+      ],
+      "source_packages": [
+        {
+          "type": "library_zip",
+          "name": "subvenciones-review-v1.0.0_2026-09-17_22-18.zip",
+          "file_id": "file_000000008ebc81f4a5fb4908d07c2ff5",
+          "library_file_id": "libfile_46e050aad7988191a4470f30c842b793",
+          "library_path": "/subvenciones-review-v1.0.0_2026-09-17_22-18.zip",
+          "verified_contents": "full_source",
+          "source_files_observed": 51,
+          "test_files_observed": 24
+        }
+      ],
+      "source_status": "located"
+    },
+    {
+      "name": "TALSANET",
+      "aliases": [
+        "talsanet",
+        "talsabell tablet"
+      ],
+      "source": "",
+      "critical_checks": [
+        "conexión PLC/IoT",
+        "modo offline",
+        "telemetría",
+        "backoffice",
+        "ciberseguridad"
+      ],
+      "source_packages": [
+        {
+          "type": "library_zip",
+          "name": "Codigo_TALSA_y_Atelier_Revision.zip",
+          "file_id": "file_000000006cbc81f5a01477a057b940d8",
+          "library_file_id": "libfile_8e840fe7b50c8191911fd2b573c38679",
+          "library_path": "/Codigo_TALSA_y_Atelier_Revision.zip",
+          "verified_contents": "dist_javascript_and_review_docs",
+          "source_files_observed": 3,
+          "test_files_observed": 0
+        }
+      ],
+      "source_status": "located"
+    },
+    {
+      "name": "Qentyra",
+      "aliases": [
+        "qentyra"
+      ],
+      "source": "",
+      "critical_checks": [
+        "propuesta de valor",
+        "backend",
+        "datos",
+        "pagos"
+      ],
+      "source_status": "not_located_in_github_or_library_as_source_package"
+    },
+    {
+      "name": "Software Auditoría",
+      "aliases": [
+        "audit-pro",
+        "normativa-contable"
+      ],
+      "source": "",
+      "critical_checks": [
+        "OCR",
+        "clasificación",
+        "IA local",
+        "60 papeles",
+        "autorrecuperación",
+        "trazabilidad"
+      ],
+      "repository": "https://github.com/Nachollo/normativa-contable-espa-a.git",
+      "ref": "copilot/fix-75705fbf-ec86-411e-8e16-2c0962564099"
+    },
+    {
+      "name": "Validador Cuentas Justificativas",
+      "aliases": [
+        "validador-cuentas-justificativas",
+        "validador subvenciones"
+      ],
+      "source": "",
+      "repository": "https://github.com/Nachollo/validador-cuentas-justificativas.git",
+      "ref": "main",
+      "critical_checks": [
+        "OCR real vs simulado",
+        "persistencia Electron",
+        "validación normativa real",
+        "generación Excel real",
+        "tests reproducibles",
+        "CI real"
+      ]
+    }
+  ]
+}
